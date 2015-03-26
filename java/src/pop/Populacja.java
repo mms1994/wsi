@@ -50,4 +50,5 @@ public class Populacja {
             System.out.println("");
         }
     }
+
 }
