@@ -1,11 +1,6 @@
-/**
- * Created by Michał on 2015-03-26.
- */
-import pop.Populacja;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Random;
+
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
@@ -19,12 +14,8 @@ public class Main {
                 Pm = 0.05;		//prawdopodobienstwo mutacji
 
         double  dx=0.001;		//krok (dokladnosc)
-        File plik = new File("wynik.txt");
         PrintWriter zapis = new PrintWriter("wynik.txt");
         zapis.println("-------------------------------------------------\nP = " + P + ", N = " + N + ", H = " + H + "\nPrzedzial: <" + a + ";" + b + ">");
-
-
-        Random generatorM = new Random();
 
         //liczba bitow
         int liczba_bitow;
@@ -58,15 +49,15 @@ public class Main {
         int nr_wiersza_max = 0;
         wc_tab = pop.Populacja.ocena_populacji(tab_roz, P, nr_wiersza_max);
 
-        //wartosc max przed metla
+        //wartosc max przed petla
         for(int i=0; i<N; i++)
         {
             najl_osobnik[i] = tab_roz[nr_wiersza_max][i];
         }
         najl_wart = wc_tab[nr_wiersza_max][0];
 
-        //cout << "\n----------- OCENA POPULACJI ----------- " << endl;
-        //wyswietl_rozkod(wc_tab, P,1);
+        System.out.println("\n----------- OCENA POPULACJI ----------- ");
+        pop.Populacja.wyswietl_rozkod(wc_tab, P,1);
 
         for(int h=0; h<H; h++)
         {

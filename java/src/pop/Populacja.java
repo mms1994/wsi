@@ -1,10 +1,6 @@
 package pop;
 import java.util.Random;
 
-/**
- * Created by Michał on 2015-03-26.
- */
-
 public class Populacja {
     public static int bity(double dx, double a, double b) {
         int bit = 0;
@@ -15,8 +11,7 @@ public class Populacja {
 
     // ustawienie kroku
     public static double krok(int bit, double a, double b) {
-        double k = (Math.abs(b - a)) / (Math.pow(2, bit) - 1);
-        return k;
+        return (Math.abs(b - a)) / (Math.pow(2, bit) - 1);
     }
 
     // losowanie populacji
@@ -140,13 +135,13 @@ public class Populacja {
         }
         Random generatore = new Random();
         double wart_losowa;
-        double suma_el = 0;
+        double suma_el;
         int wiersz = 0;
         boolean wynik;
 
         //losowanie wartosci
         for (int k = 0; k < P; k++) {
-            wart_losowa = (double) generatore.nextDouble();
+            wart_losowa = generatore.nextDouble();
             suma_el = 0;
             wynik = false;
 
