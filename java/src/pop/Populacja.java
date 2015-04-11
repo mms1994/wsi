@@ -10,7 +10,7 @@ public class Populacja {
     }
 
     // ustawienie kroku
-    public static double krok(int bit, double a, double b) {
+    public static double krok(double a, double b, int bit) {
         return (Math.abs(b - a)) / (Math.pow(2, bit) - 1);
     }
 
@@ -22,7 +22,7 @@ public class Populacja {
         for (int i = 0; i < P; i++)
             for (int j = 0; j < N * G; j++) {
                 Random generator = new Random();
-                tab[i][j] = generator.nextInt() * 2;
+                tab[i][j] = Math.abs(generator.nextInt()%2);
             }
 
 
@@ -76,19 +76,22 @@ public class Populacja {
     }
 
     //funkcja celu
-    public static double f_celu(double x, double y) {
-        return (-(20 + ((x * x) - (10 * Math.cos(2 * 3.14 * x)) + ((y * y) - (10 * Math.cos(2 * 3.14 * y))))));
+    public static double f_celu(double tab[]) {
+        double sum=0;
+        for(int i=0; i<tab.length; i++)
+            sum+=tab[i]*tab[i];
+        return -(sum);
     }
 
     //ocena populacji
     public static double[][] ocena_populacji(double tab_rozk[][], int P, int nr_wiersza_max) {
         double[][] tab = new double[P][1];
 
-        double max = f_celu(tab_rozk[0][0], tab_rozk[0][1]);        //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
+        double max = f_celu(tab_rozk[0]);        //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
         nr_wiersza_max = 0;
 
         for (int i = 0; i < P; i++) {
-            tab[i][0] = f_celu(tab_rozk[i][0], tab_rozk[i][1]); //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
+            tab[i][0] = f_celu(tab_rozk[i]); //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
             if (tab[i][0] > max)
                 nr_wiersza_max = i;
         }

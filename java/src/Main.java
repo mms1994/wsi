@@ -4,22 +4,22 @@ import java.io.PrintWriter;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        int P = 1000,			//liczba osobników (rozwiazań)
+        int P = 100,			//liczba osobników (rozwiazań)
                 N = 2,				//liczba zmiennych funkcji
-                H = 1000,			//liczba iteracji programu
-                a=-3,			//poczatek przedzialu
-                b=3;			//koniec przedzialu
+                H = 100;			//liczba iteracji programu
 
-        double  Pk = 0.8,		//prawodpobienstwo krzyzowania
+        double  a=-1,			//poczatek przedzialu
+                b=1,			//koniec przedzialu
+                Pk = 0.8,		//prawodpobienstwo krzyzowania
                 Pm = 0.05;		//prawdopodobienstwo mutacji
 
-        double  dx=0.001;		//krok (dokladnosc)
+        double  dx=0.1;		//krok (dokladnosc)
         PrintWriter zapis = new PrintWriter("wynik.txt");
         zapis.println("-------------------------------------------------\nP = " + P + ", N = " + N + ", H = " + H + "\nPrzedzial: <" + a + ";" + b + ">");
 
         //liczba bitow
         int liczba_bitow;
-        liczba_bitow = pop.Populacja.bity(a, b, dx);
+        liczba_bitow = pop.Populacja.bity(dx, a, b);
 
         //zmienna przechowujaca wiersz najlepszego z elementow
         double []najl_osobnik = new double[N];
