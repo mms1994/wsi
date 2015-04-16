@@ -36,7 +36,7 @@ public class Populacja {
             for (int j = 0; j < N * G; j++) {
                 System.out.print(pop[i][j]);
                 if ((j + 1) % G == 0)
-                    System.out.print("| ");
+                    System.out.print(" | ");
             }
             System.out.println("");
         }
