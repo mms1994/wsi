@@ -5,13 +5,13 @@ import java.io.PrintWriter;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         int P = 100,			//liczba osobników (rozwiazań)
-                N = 2,				//liczba zmiennych funkcji
-                H = 100;			//liczba iteracji programu
+                N = 3,				//liczba zmiennych funkcji
+                H = 1000;			//liczba iteracji programu
 
-        double  a=-1,			//poczatek przedzialu
-                b=1,			//koniec przedzialu
+        double  a=-3,			//poczatek przedzialu
+                b=3,			//koniec przedzialu
                 Pk = 0.8,		//prawodpobienstwo krzyzowania
-                Pm = 0.05;		//prawdopodobienstwo mutacji
+                Pm = 0.01;		//prawdopodobienstwo mutacji
 
         double  dx=0.1;		//krok (dokladnosc)
         PrintWriter zapis = new PrintWriter("wynik.txt");
