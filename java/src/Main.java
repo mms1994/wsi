@@ -1,103 +1,70 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-
+import pop.Populacja;
 
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException {
-        int P = 100,			//liczba osobników (rozwiazań)
-                N = 3,				//liczba zmiennych funkcji
-                H = 1000;			//liczba iteracji programu
+    static final int P = 100;  //P-liczba osobnikow
+    static final int N = 3; //N-liczba kolumn kazdego osobnika tzn. X1, X2, X3 ...
+    static final double dx = 0.01; //dx-poczatkowy krok czyli dokladnosc.
+    static final int a = -2;  //a-poczatek b-koniec przedzialu.
+    static final int b = 2;
+    static final double	Pk = 0.75; //Pk-prawdopodobienstwo krzyzowania
+    static final double	Pm  = 0.05; //Pm-Parametr mutacji(prawdopodobienstwo).
+    static final int T = 2000; //T-liczba iteracji w petli
 
-        double  a=-3,			//poczatek przedzialu
-                b=3,			//koniec przedzialu
-                Pk = 0.8,		//prawodpobienstwo krzyzowania
-                Pm = 0.01;		//prawdopodobienstwo mutacji
-
-        double  dx=0.1;		//krok (dokladnosc)
-        PrintWriter zapis = new PrintWriter("wynik.txt");
-        zapis.println("-------------------------------------------------\nP = " + P + ", N = " + N + ", H = " + H + "\nPrzedzial: <" + a + ";" + b + ">");
-
-        //liczba bitow
-        int liczba_bitow;
-        liczba_bitow = pop.Populacja.bity(dx, a, b);
-
-        //zmienna przechowujaca wiersz najlepszego z elementow
-        double []najl_osobnik = new double[N];
+    public static void main(String[] args) {
+        double najl_osobnik[] = new double[N];
+        double srednie_wart_osobnikow[] = new double[T];
         double najl_wart;
-        double []srednie_wart_osobnikow = new double[H];
 
-        //nowa populacja
-        int [][]tablica = pop.Populacja.pop(P, N, liczba_bitow);
+        Populacja pop = new Populacja(P,N,a,b,dx);
 
-        System.out.println("\n----------- POCZATKOWA POPULACJA -----------");
-        pop.Populacja.wyswietl_pop(tablica, P, N, liczba_bitow);
+        double wc_tab[][]; //ocena populacji
+        Double nr_wiersza_max = new Double(0);
+        wc_tab = pop.ocena_populacji(P, nr_wiersza_max);
 
-        //nowa liczba korkow
-        double dx2;
-        dx2 = pop.Populacja.krok(a, b, liczba_bitow);
-        zapis.println("\tKrok: "+ dx2 + "\tPk: " + Pk + "\tPm: " + Pm + "\n \n Nr. petli\tMaks"); //zapis do pliku
 
-        //rozkodowowana populacja
-        double[][] tab_roz;
-        tab_roz = pop.Populacja.rozkoduj(tablica, P, N, liczba_bitow, dx2, a);
-
-        System.out.println("\n----------- ROZKODOWANA POPULACJA----------- ");
-        pop.Populacja.wyswietl_rozkod(tab_roz, P, N);
-
-        //ocena populacji
-        double [][]wc_tab;
-        int nr_wiersza_max = 0;
-        wc_tab = pop.Populacja.ocena_populacji(tab_roz, P, nr_wiersza_max);
-
-        //wartosc max przed petla
+        //wartosc max przed metla
         for(int i=0; i<N; i++)
         {
-            najl_osobnik[i] = tab_roz[nr_wiersza_max][i];
+            najl_osobnik[i] = pop.getmaxroz(nr_wiersza_max.doubleValue(),i);
         }
-        najl_wart = wc_tab[nr_wiersza_max][0];
+        najl_wart = wc_tab[(int)nr_wiersza_max.doubleValue()][0];
 
-        System.out.println("\n----------- OCENA POPULACJI ----------- ");
-        pop.Populacja.wyswietl_rozkod(wc_tab, P,1);
 
-        for(int h=0; h<H; h++)
+        for(int h=0; h<T; h++)
         {
-            //ruletka
-            pop.Populacja.Ruletka(tablica, wc_tab, P, N, liczba_bitow);
+            pop.ruletka(wc_tab, P, N);
 
             //krzyzowanie
-            pop.Populacja.Krzyzowanie(tablica, P, N, liczba_bitow, Pk);
+            pop.Krzyzowanie(P, N, Pk);
 
             //mutacja
-            pop.Populacja.Mutacja(tablica, P, N, liczba_bitow, Pm);
+            pop.Mutacja(P, N,Pm);
 
             //rozkodowanie
-            tab_roz = pop.Populacja.rozkoduj(tablica, P, N, liczba_bitow, dx2, a);
+            pop.do_dziesietnej(P, N, pop.bits, pop.dx2, a);
 
             //ocena populacji
-            wc_tab = pop.Populacja.ocena_populacji(tab_roz, P, nr_wiersza_max);
+            wc_tab = pop.ocena_populacji(P, nr_wiersza_max);
 
-            if (najl_wart < wc_tab[nr_wiersza_max][0])
+            if (najl_wart < wc_tab[(int)nr_wiersza_max.doubleValue()][0])
             {
-                zapis.println(h + "\t=WARTOŚĆ(PODSTAW(\"" + wc_tab[nr_wiersza_max][0] + "\";\".\";\",\"))");
-                najl_wart = wc_tab[nr_wiersza_max][0];
+                najl_wart = wc_tab[(int)nr_wiersza_max.doubleValue()][0];
                 for(int i=0; i<N; i++)
                 {
-                    najl_osobnik[i] = tab_roz[nr_wiersza_max][i];
+                    najl_osobnik[i] = pop.getmaxroz((int)nr_wiersza_max.doubleValue(),i);
                 }
             }
 
-            srednie_wart_osobnikow[h]=pop.Populacja.sr_wart(wc_tab, P);
+            srednie_wart_osobnikow[h]= pop.sr_przystosowanie(wc_tab, P);
         }
         System.out.println("\n----------- NAJLEPSZY OSOBNIK ----------- ");
         System.out.println("Wartosc najlepszego osobnika: " + najl_wart);
         System.out.println("Najlepszy osobnik to: ");
 
-        System.out.println("| ");
-        for(int j=0; j<N; j++)
+        for(double j: najl_osobnik)
         {
-            System.out.println(najl_osobnik[j] + " | ");
+            System.out.print(j + " | ");
         }
-        System.out.println("");
-        zapis.close();
+        System.out.println();
     }
 }

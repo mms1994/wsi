@@ -1,253 +1,281 @@
 package pop;
+
 import java.util.Random;
 
 public class Populacja {
-    public static int bity(double dx, double a, double b) {
-        int bit = 0;
-        while (Math.pow(2, (double) bit) - 1 < Math.ceil((b - a) * (1 / dx)))
+    public int bits;
+    int pop[][];
+    public double dx2;
+    double pop_dec[][];
+
+    //liczenie liczby bitow (genów)
+    private void bity(double a, double b, double dx) {
+        int bit=0;
+        while(Math.pow(2, (double)bit)-1 < Math.ceil((b-a) * (1/dx)))
             bit++;
-        return bit;
+        bits=bit;
     }
 
-    // ustawienie kroku
-    public static double krok(double a, double b, int bit) {
-        return (Math.abs(b - a)) / (Math.pow(2, bit) - 1);
+    //nowy krok (dx_2)
+    private void krok(double a, double b, double bit) {
+        dx2 = (Math.abs(b-a)) / (Math.pow(2,bit)-1);
     }
 
-    // losowanie populacji
-    public static int[][]pop(int P, int N, int G) {
+    //konstruktor:
+    public Populacja(int P, int N, int a, int b, double dx) {
+        this.bity(a, b, dx);	//liczenie liczby bitow (genów)
+        this.krok(a, b, bits);	//nowy krok (dx_2)
 
-        int tab[][] = new int[P][N * G];
-
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++) {
-                Random generator = new Random();
-                tab[i][j] = Math.abs(generator.nextInt()%2);
+        pop = new int[P][N*bits];	//losowanie nowej populacji:
+        Random generator = new Random();
+        for (int i=0; i<P; i++)
+        {
+            for (int j=0; j<N*bits; j++)
+            {
+                pop[i][j] = generator.nextInt(2);
             }
-
-
-        return tab;
-    }
-
-    //wyswietlenie populacji
-    public static void wyswietl_pop(int pop[][], int P, int N, int G) {
-        for (int i = 0; i < P; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < N * G; j++) {
-                System.out.print(pop[i][j]);
-                if ((j + 1) % G == 0)
-                    System.out.print(" | ");
-            }
-            System.out.println("");
         }
+        this.do_dziesietnej(P, N, bits, dx2, a);
     }
 
-    //rozkodowanie tablicy
-    public static double[][] rozkoduj(int pop[][], int P, int N, int G, double dx, double a) {
-        double tab[][] = new double[P][N];
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N; j++)
-                tab[i][j] = 0;
+    //zamiana POPulacji na dziesietne...
+    public void do_dziesietnej(int P, int N, int B, double dx, double a) {
+        pop_dec = new double[P][N];	//tablica rozkodowanej populacji.
 
+        for(int i=0; i<P; i++)
+            for(int j=0; j<N; j++)
+                pop_dec[i][j] = 0;
         int waga;
-        for (int i = 0; i < P; i++) {
-            for (int k = 1; k <= N; k++) {
-                waga = 0;
-                for (int j = (k * G) - 1; j >= G * (k - 1); j--) {
-                    tab[i][k - 1] += Math.pow(2, (double) waga) * pop[i][j];
+        for(int i=0; i<P; i++)
+        {
+            for(int k = 1; k<=N; k++)
+            {
+                waga=0;
+                for(int j=(k*B)-1; j>=B*(k-1); j--)
+                {
+                    pop_dec[i][k-1] += Math.pow(2, (double)waga) * pop[i][j];
                     waga++;
                 }
-                tab[i][k - 1] = tab[i][k - 1] * dx + a;
+                pop_dec[i][k-1] = pop_dec[i][k-1] * dx + a;
             }
         }
-        return tab;
     }
 
-    //wyswietlenie rozkodowanej tablicy
-    public static void wyswietl_rozkod(double tab_rozk[][], int P, int N) {
-        for (int i = 0; i < P; i++) {
-            System.out.println("| ");
-            for (int j = 0; j < N; j++) {
-                System.out.print(tab_rozk[i][j]);
-                System.out.print(" | ");
-            }
-            System.out.println("");
+    public void wyswietl_pop() {
+        for(int i=0; i<pop.length; i++)
+        {
+            for(int j=0; j< pop[i].length; j++)
+                System.out.print(pop[i][j] + " ");
+            System.out.println();
         }
     }
 
-    //funkcja celu
-    public static double f_celu(double tab[]) {
-        double sum=0;
-        for(int i=0; i<tab.length; i++)
-            sum+=tab[i]*tab[i];
-        return -(sum);
-    }
-
-    //ocena populacji
-    public static double[][] ocena_populacji(double tab_rozk[][], int P, int nr_wiersza_max) {
-        double[][] tab = new double[P][1];
-
-        double max = f_celu(tab_rozk[0]);        //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
-        nr_wiersza_max = 0;
-
-        for (int i = 0; i < P; i++) {
-            tab[i][0] = f_celu(tab_rozk[i]); //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
-            if (tab[i][0] > max)
-                nr_wiersza_max = i;
+    public void wyswietl_dziesietna() {
+        for(int i=0; i<pop_dec.length; i++){
+            for(int j=0; j<pop_dec[i].length; j++)
+                System.out.print(pop_dec[i][j] + " ");
+            System.out.println();
         }
 
-        return tab;
     }
 
-    //suma wartosci
-    public static double sr_wart(double wc_tab[][], int P) {
-        double suma = 0;
+    private double f_celu(double x1, double x2) {
+        double cel = (-(20 + ((x1 * x1) - (10 * Math.cos(2 * 3.14 * x1)) + ((x2 * x2) - (10 * Math.cos(2 * 3.14 * x2))))));
+        return cel;
+    }
+
+    public double[][] ocena_populacji(int P, double wiersz_max)
+    {
+        double mat[][] = new double[P][];
         for (int i = 0; i < P; i++)
-            suma += wc_tab[i][0];
-
-        return suma / P;
+            mat[i] = new double[1];
+        double max = f_celu(this.pop_dec[0][0], this.pop_dec[0][1]);		//modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
+        wiersz_max = 0.0;
+        for(int i=0; i<P; i++)
+        {
+            mat[i][0] = f_celu(this.pop_dec[i][0], this.pop_dec[i][1]); //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
+            if(mat[i][0]>max)
+                wiersz_max=(double)i;
+        }
+        return mat;
     }
 
-    //ruletka
-    public static void Ruletka(int pop[][], double wc_tab[][], int P, int N, int G) {
-        //tablica z pradopodobieństwami
-        double[][] tab = new double[P][1];
 
-        //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        int[][] pop_temp = new int[P][N * G];
+    //metoda selekcji(RULETKA):
+    public void ruletka(double matrix_oc[][], int P, int N) {
+        double[][] tab = new double [P][]; //tablica z pradopodobienstwami
+        for (int i = 0; i < P; i++)
+            tab[i] = new double[1];
+        int[][] pop_temp = new int [P][]; //kopia wejsciowej tablicy z nowa populacja (tablica pop)
+        for (int i = 0; i < P; i++)
+            pop_temp[i] = new int[N*bits];
 
         //szukamy wartosc minimalnej w tablicy z wartosciami funkcji oraz sumujemy elementy z tej tablicy
-        double min = wc_tab[0][0], suma_wc_tab = 0, suma_wekt_prawdo = 0;
-        for (int i = 0; i < P; i++) {
-            if (wc_tab[i][0] < min)
-                min = wc_tab[i][0];
-            suma_wc_tab += wc_tab[i][0]; //suma elementow tablicy z wartosciami
+        double min = matrix_oc[0][0], suma_matrix_oc = 0, suma_vec_prawdo = 0;
+        for(int i=0; i<P; i++)
+        {
+            if(matrix_oc[i][0]<min)
+                min=matrix_oc[i][0];
+            suma_matrix_oc += matrix_oc[i][0]; //suma elementow tablicy z wartosciami
         }
 
-        if (min >= 0) {
-            for (int i = 0; i < P; i++) {
-                tab[i][0] = wc_tab[i][0] / suma_wc_tab;
-                suma_wekt_prawdo += tab[i][0];
-            }
-        } else {
-            suma_wc_tab += P * (Math.abs(min) + 1);
-            for (int i = 0; i < P; i++) {
-                tab[i][0] = (wc_tab[i][0] + Math.abs(min) + 1) / suma_wc_tab;
-                suma_wekt_prawdo += tab[i][0];
+        if(min>=0)
+        {
+            for(int i=0; i<P; i++)
+            {
+                tab[i][0] = matrix_oc[i][0]/suma_matrix_oc;
+                suma_vec_prawdo+=tab[i][0];
             }
         }
-        Random generatore = new Random();
-        double wart_losowa;
-        double suma_el;
-        int wiersz = 0;
+        else
+        {
+            suma_matrix_oc += P*(Math.abs(min)+1);
+            for(int i =0; i<P; i++)
+            {
+                tab[i][0] = (matrix_oc[i][0]+Math.abs(min)+1)/suma_matrix_oc;
+                suma_vec_prawdo+=tab[i][0];
+            }
+        }
+
+        Random generator = new Random();
+        double war_losowa;
+        double suma_el = 0;
+        int nr_wiersza = 0;
         boolean wynik;
 
         //losowanie wartosci
-        for (int k = 0; k < P; k++) {
-            wart_losowa = generatore.nextDouble();
+        for(int k=0; k<P; k++)
+        {
+            war_losowa = generator.nextDouble();
             suma_el = 0;
-            wynik = false;
+            wynik=false;
 
-            for (int i = 0; i < P; i++) {
+            for(int i=0; i<P; i++)
+            {
                 suma_el += tab[i][0];
-                if (wart_losowa < suma_el) {
-                    wiersz = i;
-                    wynik = true;
+                if(war_losowa<suma_el)
+                {
+                    nr_wiersza = i;
+                    wynik=true;
                 }
-                if (wynik) break;
+                if(wynik) break;
             }
 
-            for (int j = 0; j < N * G; j++)
-                pop_temp[k][j] = pop[wiersz][j];
+            for(int j=0; j<N*bits; j++)
+                pop_temp[k][j] = this.pop[nr_wiersza][j];
         }
 
         //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie ruletki
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++)
-                pop[i][j] = pop_temp[i][j];
+        for(int i =0; i<P; i++)
+            for(int j=0; j<N*bits; j++)
+                this.pop[i][j] = pop_temp[i][j];
+
     }
 
-    //krzyzowanie
-    public static void Krzyzowanie(int pop[][], int P, int N, int G, double Pk) {
-        if ((Pk < 0) || (Pk > 1)) {
+    public void Krzyzowanie(int P, int N, double Pk) {
+        if ((Pk<0) || (Pk>1))
+        {
             System.out.println("Bledna wartosc prawodpodobienswa krzyzowania. Musi sie zawierac w przedziale [0;1]");
             return;
         }
 
         //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        int pop_temp[][] = new int[P][N * G];
+        int pop_temp[][] = new int [P][];
+        for (int i = 0; i < P; i++)
+            pop_temp[i] = new int[N*bits];
 
         //przekopiowanie elementow z wejsciowej tablicy pop do jej kopii
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++)
-                pop_temp[i][j] = pop[i][j];
+        for(int i =0; i<P; i++)
+            for(int j=0; j<N*bits; j++)
+                pop_temp[i][j] = this.pop[i][j];
 
-
+        Random generator = new Random();
         int bit_przeciecia;
         double r;
-        Random generatora = new Random();
-        for (int j = 0; j < (P - 1); j = j + 2) {
-            r = generatora.nextDouble();
-            //cout << "Wartosc losowa: " << r << endl;
 
-            bit_przeciecia = generatora.nextInt(N * G - 1) + 1;
-            //cout << "Bit przeciecia: " << bit_przeciecia << endl;
+        for(int j=0; j<(P-1); j=j+2)
+        {
+            r=generator.nextDouble();
+            bit_przeciecia = Math.abs((generator.nextInt()%((N*bits)-1))) +1;
 
-            if (r >= Pk)
+            if(r>=Pk)
                 continue;
 
             //poczatek
-            for (int i = 0; i < bit_przeciecia; i++) {
-                pop_temp[j][i] = pop[j][i];
-                pop_temp[j + 1][i] = pop[j + 1][i];
+            for(int i=0; i<bit_przeciecia; i++)
+            {
+                pop_temp[j][i]=this.pop[j][i];
+                pop_temp[j+1][i]=this.pop[j+1][i];
             }
 
             //koniec
-            for (int i = bit_przeciecia; i < N * G; i++) {
-                pop_temp[j][i] = pop[j + 1][i];
-                pop_temp[j + 1][i] = pop[j][i];
+            for(int i=bit_przeciecia; i<N*bits; i++)
+            {
+                pop_temp[j][i]=this.pop[j+1][i];
+                pop_temp[j+1][i]=this.pop[j][i];
             }
         }
 
         //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie ruletki
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++)
-                pop[i][j] = pop_temp[i][j];
+        for(int i =0; i<P; i++)
+            for(int j=0; j<N*bits; j++)
+                this.pop[i][j] = pop_temp[i][j];
     }
 
     //mutacja
-    public static void Mutacja(int pop[][], int P, int N, int G, double Pm) {
-        if ((Pm < 0) || (Pm > 1)) {
-            System.out.println("Bledna wartosc prawodpodobienswa mutacji. Musi sie zawierac w przedziale [0;1]");
+    public void Mutacja(int P, int N, double Pm)
+    {
+        if ((Pm <0) || (Pm >1))
+        {
+            System.out.println("Bledna wartosc prawodpodobienswa krzyzowania. Musi sie zawierac w przedziale [0;1]");
             return;
         }
 
         //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        int pop_temp[][] = new int[P][N * G];
+        int[][] pop_temp = new int [P][];
+        for (int i = 0; i < P; i++)
+            pop_temp[i] = new int[N*bits];
 
         //przekopiowanie elementow z wejsciowej tablicy pop do jej kopii
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++)
-                pop_temp[i][j] = pop[i][j];
+        for(int i =0; i<P; i++)
+            for(int j=0; j<N*bits; j++)
+                pop_temp[i][j] = this.pop[i][j];
 
+        Random generator = new Random();
         double r;
-        Random generatoro = new Random();
-        for (int i = 0; i < P; i++) {
-            for (int j = 0; j < N * G; j++) {
-                r = generatoro.nextDouble();
-
-                if (r >= Pm)
+        for(int i =0; i<P; i++)
+        {
+            for(int j=0; j<N*bits; j++)
+            {
+                r=generator.nextDouble();
+                if(r>=Pm)
                     continue;
-
-                if (pop_temp[i][j] == 0)
-                    pop_temp[i][j] = 1;
-                else pop_temp[i][j] = 0;
+                if (pop_temp[i][j]==0)
+                    pop_temp[i][j]=1;
+                else
+                    pop_temp[i][j]=0;
             }
         }
 
         //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie ruletki
-        for (int i = 0; i < P; i++)
-            for (int j = 0; j < N * G; j++)
-                pop[i][j] = pop_temp[i][j];
+        for(int i =0; i<P; i++)
+            for(int j=0; j<N*bits; j++)
+                this.pop[i][j] = pop_temp[i][j];
     }
+
+    public double sr_przystosowanie(double matrix_oc[][], int P)
+    {
+        double suma = 0;
+        for(int i=0; i<P; i++)
+            suma+=matrix_oc[i][0];
+        return suma/P;
+    }
+
+    public double getmaxroz(double d, int n)
+    {
+        return this.pop_dec[(int)d][n];
+    }
+
+
+//koniec class Pupulacja//
 }
