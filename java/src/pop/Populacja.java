@@ -61,41 +61,23 @@ public class Populacja {
         }
     }
 
-    public void wyswietl_pop() {
-        for(int i=0; i<pop.length; i++)
-        {
-            for(int j=0; j< pop[i].length; j++)
-                System.out.print(pop[i][j] + " ");
-            System.out.println();
-        }
-    }
-
-    public void wyswietl_dziesietna() {
-        for(int i=0; i<pop_dec.length; i++){
-            for(int j=0; j<pop_dec[i].length; j++)
-                System.out.print(pop_dec[i][j] + " ");
-            System.out.println();
-        }
-
-    }
-
-    private double f_celu(double x1, double x2) {
-        double cel = (-(20 + ((x1 * x1) - (10 * Math.cos(2 * 3.14 * x1)) + ((x2 * x2) - (10 * Math.cos(2 * 3.14 * x2))))));
+    private double f_celu(double x1, double x2, double x3) {
+        double cel = (-x1*x1-x2*x2-x3*x3);
         return cel;
     }
 
     public double[][] ocena_populacji(int P, double wiersz_max)
     {
-        double mat[][] = new double[P][];
-        for (int i = 0; i < P; i++)
-            mat[i] = new double[1];
-        double max = f_celu(this.pop_dec[0][0], this.pop_dec[0][1]);		//modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
+        double mat[][] = new double[P][1];
+        double max = f_celu(this.pop_dec[0][0], this.pop_dec[0][1], this.pop_dec[0][2]);
         wiersz_max = 0.0;
         for(int i=0; i<P; i++)
         {
-            mat[i][0] = f_celu(this.pop_dec[i][0], this.pop_dec[i][1]); //modyfikujemy z zaleznosci od tego ile zmiennych mamy w funkcji
-            if(mat[i][0]>max)
+            mat[i][0] = f_celu(this.pop_dec[i][0], this.pop_dec[i][1], this.pop_dec[i][2]);
+            if(mat[i][0]>max) {
                 wiersz_max=(double)i;
+                max=mat[i][0];
+            }
         }
         return mat;
     }
@@ -103,12 +85,8 @@ public class Populacja {
 
     //metoda selekcji(RULETKA):
     public void ruletka(double matrix_oc[][], int P, int N) {
-        double[][] tab = new double [P][]; //tablica z pradopodobienstwami
-        for (int i = 0; i < P; i++)
-            tab[i] = new double[1];
-        int[][] pop_temp = new int [P][]; //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        for (int i = 0; i < P; i++)
-            pop_temp[i] = new int[N*bits];
+        double tab[][] = new double [P][1]; //tablica z pradopodobienstwami
+        int pop_temp[][] = new int [P][N*bits]; //kopia wejsciowej tablicy z nowa populacja
 
         //szukamy wartosc minimalnej w tablicy z wartosciami funkcji oraz sumujemy elementy z tej tablicy
         double min = matrix_oc[0][0], suma_matrix_oc = 0, suma_vec_prawdo = 0;
@@ -180,9 +158,7 @@ public class Populacja {
         }
 
         //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        int pop_temp[][] = new int [P][];
-        for (int i = 0; i < P; i++)
-            pop_temp[i] = new int[N*bits];
+        int pop_temp[][] = new int [P][N*bits];
 
         //przekopiowanie elementow z wejsciowej tablicy pop do jej kopii
         for(int i =0; i<P; i++)
@@ -232,9 +208,7 @@ public class Populacja {
         }
 
         //kopia wejsciowej tablicy z nowa populacja (tablica pop)
-        int[][] pop_temp = new int [P][];
-        for (int i = 0; i < P; i++)
-            pop_temp[i] = new int[N*bits];
+        int[][] pop_temp = new int [P][N*bits];
 
         //przekopiowanie elementow z wejsciowej tablicy pop do jej kopii
         for(int i =0; i<P; i++)
@@ -276,6 +250,23 @@ public class Populacja {
         return this.pop_dec[(int)d][n];
     }
 
+    public void wyswietl_pop() {
+        for(int i=0; i<pop.length; i++)
+        {
+            for(int j=0; j< pop[i].length; j++)
+                System.out.print(pop[i][j] + " ");
+            System.out.println();
+        }
+    }
+
+    public void wyswietl_dziesietna() {
+        for(int i=0; i<pop_dec.length; i++){
+            for(int j=0; j<pop_dec[i].length; j++)
+                System.out.print(pop_dec[i][j] + " ");
+            System.out.println();
+        }
+
+    }
 
 //koniec class Pupulacja//
 }

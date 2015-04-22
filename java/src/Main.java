@@ -1,14 +1,14 @@
 import pop.Populacja;
 
 public class Main {
-    static final int P = 100;  //P-liczba osobnikow
+    static final int P = 30;  //P-liczba osobnikow
     static final int N = 3; //N-liczba kolumn kazdego osobnika tzn. X1, X2, X3 ...
-    static final double dx = 0.01; //dx-poczatkowy krok czyli dokladnosc.
+    static final double dx = 0.0001; //dx-poczatkowy krok czyli dokladnosc.
     static final int a = -2;  //a-poczatek b-koniec przedzialu.
     static final int b = 2;
     static final double	Pk = 0.75; //Pk-prawdopodobienstwo krzyzowania
-    static final double	Pm  = 0.05; //Pm-Parametr mutacji(prawdopodobienstwo).
-    static final int T = 2000; //T-liczba iteracji w petli
+    static final double	Pm  = 0.25; //Pm-Parametr mutacji(prawdopodobienstwo).
+    static final int T = 5000; //T-liczba iteracji w petli
 
     public static void main(String[] args) {
         double najl_osobnik[] = new double[N];
