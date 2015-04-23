@@ -1,11 +1,11 @@
 import pop.Populacja;
 
 public class Main {
-    static final int P = 30;  //P-liczba osobnikow
+    static final int P = 100;  //P-liczba osobnikow
     static final int N = 3; //N-liczba kolumn kazdego osobnika tzn. X1, X2, X3 ...
     static final double dx = 0.0001; //dx-poczatkowy krok czyli dokladnosc.
-    static final int a = -2;  //a-poczatek b-koniec przedzialu.
-    static final int b = 2;
+    static final int a = -10;  //a-poczatek b-koniec przedzialu.
+    static final int b = 10;
     static final double	Pk = 0.75; //Pk-prawdopodobienstwo krzyzowania
     static final double	Pm  = 0.25; //Pm-Parametr mutacji(prawdopodobienstwo).
     static final int T = 5000; //T-liczba iteracji w petli
@@ -22,7 +22,7 @@ public class Main {
         wc_tab = pop.ocena_populacji(P, nr_wiersza_max);
 
 
-        //wartosc max przed metla
+        //wartosc max przed petla
         for(int i=0; i<N; i++)
         {
             najl_osobnik[i] = pop.getmaxroz(nr_wiersza_max.doubleValue(),i);

@@ -63,6 +63,18 @@ public class Populacja {
 
     private double f_celu(double x1, double x2, double x3) {
         double cel = (-x1*x1-x2*x2-x3*x3);
+        /*double tabx[]= new double[3];
+        tabx[0]=x1;
+        tabx[1]=x2;
+        tabx[3]=x3;
+        double xi=0;
+        double cos=0;
+        for(int i=0; i<3; i++)
+        {
+            xi+=tabx[i]*tabx[i];
+            cos+=Math.cos(2*Math.PI*tabx[i]);
+        }
+        double cel = (-20*Math.exp(-0.2*Math.sqrt((1/3)*xi)-Math.exp((1/3)*cos)));*/
         return cel;
     }
 
@@ -192,7 +204,7 @@ public class Populacja {
             }
         }
 
-        //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie ruletki
+        //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie krzyzowanie
         for(int i =0; i<P; i++)
             for(int j=0; j<N*bits; j++)
                 this.pop[i][j] = pop_temp[i][j];
@@ -231,7 +243,7 @@ public class Populacja {
             }
         }
 
-        //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie ruletki
+        //przypisanie tablicy pop przekazanej do funkcji elementow wylosowanych w procesie mutacji
         for(int i =0; i<P; i++)
             for(int j=0; j<N*bits; j++)
                 this.pop[i][j] = pop_temp[i][j];
